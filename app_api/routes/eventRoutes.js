@@ -29,6 +29,60 @@ router.post("/add", async (req, res) => {
     }
 });
 
-// Other routes like delete, update, etc. would go here
+// Get a single event by ID
+router.get("/get/:id", async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+        res.json(event);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Update an event by ID
+router.patch("/update/:id", async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        if (req.body.title != null) {
+            event.title = req.body.title;
+        }
+        if (req.body.location != null) {
+            event.location = req.body.location;
+        }
+        if (req.body.date != null) {
+            event.date = req.body.date;
+        }
+        if (req.body.remind != null) {
+            event.remind = req.body.remind;
+        }
+
+        const updatedEvent = await event.save();
+        res.json(updatedEvent);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// Delete an event by ID
+router.delete("/delete/:id", async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        await event.remove();
+        res.json({ message: "Event deleted" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 module.exports = router;
